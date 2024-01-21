@@ -9,16 +9,21 @@ import (
 )
 
 type PokeLocations struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous any    `json:"previous"`
+	Count    int     `json:"count"`
+	Next     *string `json:"next"`
+	Previous *string `json:"previous"`
 	Results  []struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
 	} `json:"results"`
 }
 
-func GetLocations(url string) PokeLocations {
+func (c *Client) GetLocations(pageURL *string) (PokeLocations, error) {
+	url := baseURL + "/location-area"
+	if pageURL != nil {
+		url = *pageURL
+	}
+
 	res, err := http.Get(fmt.Sprintf(url))
 	if err != nil {
 		log.Fatal(err)
@@ -39,5 +44,5 @@ func GetLocations(url string) PokeLocations {
 		log.Fatal(err)
 	}
 
-	return pokeLocations
+	return pokeLocations, nil
 }

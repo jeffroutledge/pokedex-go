@@ -23,9 +23,9 @@ func startRepl(cfg *config) {
 
 		text := cleanInput(reader.Text())
 		if command, exists := cliCommands()[text[0]]; exists {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
 			}
 		} else {
 			handleInvalidCmd(text[0])

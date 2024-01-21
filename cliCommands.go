@@ -1,24 +1,18 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
-
-	"github.com/jeffroutledge/CliPokedex/internal/pokeapi"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(cfg *config) error
 }
 
-type cliConfig struct {
-	nextUrl     string
-	previousUrl string
-}
-
-func commandHelp() error {
+func commandHelp(cfg *config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -30,31 +24,41 @@ func commandHelp() error {
 	return nil
 }
 
-func commandMap() error {
-	locationData := pokeapi.GetLocations(locationUrls[locationUrlIndex])
-	for _, location := range locationData.Results {
-		fmt.Println(location.Name)
-	}
-	locationUrls = append(locationUrls, locationData.Next)
-	locationUrlIndex++
-	return nil
-}
-
-func commandMapBack() error {
-	if locationUrlIndex <= 1 {
-		fmt.Println("Can't go back beyond the start, try going forward")
-		return nil
+func commandMap(cfg *config) error {
+	locationsResp, err := cfg.pokeapiClient.GetLocations(cfg.nextLocationsURL)
+	if err != nil {
+		return err
 	}
 
-	locationUrlIndex -= 2 //have to decrement by 2 to compensate for the additional step forward at the end of map
-	locationData := pokeapi.GetLocations(locationUrls[locationUrlIndex])
-	for _, location := range locationData.Results {
+	cfg.nextLocationsURL = locationsResp.Next
+	cfg.prevLocationsURL = locationsResp.Previous
+
+	for _, location := range locationsResp.Results {
 		fmt.Println(location.Name)
 	}
 	return nil
 }
 
-func commandExit() error {
+func commandMapBack(cfg *config) error {
+	if cfg.prevLocationsURL == nil {
+		return errors.New("Can't go back beyond the start, try going forward")
+	}
+
+	locationsResp, err := cfg.pokeapiClient.GetLocations(cfg.prevLocationsURL)
+	if err != nil {
+		return err
+	}
+
+	cfg.nextLocationsURL = locationsResp.Next
+	cfg.prevLocationsURL = locationsResp.Previous
+
+	for _, location := range locationsResp.Results {
+		fmt.Println(location.Name)
+	}
+	return nil
+}
+
+func commandExit(cfg *config) error {
 	defer os.Exit(3)
 	return nil
 }
