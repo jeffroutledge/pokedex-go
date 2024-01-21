@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
+	"time"
+
+	"github.com/jeffroutledge/CliPokedex/internal/pokeapi"
 )
 
 var locationUrls []string
@@ -15,19 +15,10 @@ func main() {
 	locationUrls = append(locationUrls, "https://pokeapi.co/api/v2/location/")
 	locationUrlIndex = 0
 
-	reader := bufio.NewScanner(os.Stdin)
-	for {
-		fmt.Printf("Pokedex > ")
-		reader.Scan()
-
-		text := cleanInput(reader.Text())
-		if command, exists := cliCommands()[text[0]]; exists {
-			err := command.callback()
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			handleInvalidCmd(text[0])
-		}
+	pokeClient := pokeapi.NewClient(5 * time.Second)
+	cfg := &config{
+		pokeapiClient: pokeClient,
 	}
+
+	startRepl(cfg)
 }

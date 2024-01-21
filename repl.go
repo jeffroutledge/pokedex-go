@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/jeffroutledge/CliPokedex/internal/pokeapi"
@@ -10,6 +13,24 @@ type config struct {
 	pokeapiClient    pokeapi.Client
 	nextLocationsURL *string
 	prevLocationsURL *string
+}
+
+func startRepl(cfg *config) {
+	reader := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Printf("Pokedex > ")
+		reader.Scan()
+
+		text := cleanInput(reader.Text())
+		if command, exists := cliCommands()[text[0]]; exists {
+			err := command.callback()
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			handleInvalidCmd(text[0])
+		}
+	}
 }
 
 func cleanInput(text string) []string {
