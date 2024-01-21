@@ -1,0 +1,2 @@
+- [ ] fix alignment in help menu
+- [ ] use pointer instead of dumb list for last and next urls
