@@ -41,8 +41,8 @@ func (c *Cache) reapLoop(interval time.Duration) {
 	fmt.Println(<-t.C)
 
 	go func() {
-		for t := range t.C {
-			fmt.Printf("Tick at: %v\n", t.UTC())
+		for range t.C {
+			// fmt.Printf("Tick at: %v\n", t.UTC())
 			c = &Cache{entries: make(map[string]CacheEntry), mu: sync.Mutex{}} //clear out the cache
 		}
 	}()

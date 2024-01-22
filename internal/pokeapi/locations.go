@@ -24,6 +24,16 @@ func (c *Client) GetLocations(pageURL *string) (PokeLocations, error) {
 		url = *pageURL
 	}
 
+	val, ok := c.cache.Get(url)
+	if ok {
+		pokeLocations := PokeLocations{}
+		err := json.Unmarshal([]byte(val), &pokeLocations)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return pokeLocations, nil
+	}
+
 	res, err := http.Get(fmt.Sprintf(url))
 	if err != nil {
 		log.Fatal(err)
@@ -37,6 +47,8 @@ func (c *Client) GetLocations(pageURL *string) (PokeLocations, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	c.cache.Add(url, body)
 
 	pokeLocations := PokeLocations{}
 	err = json.Unmarshal([]byte(body), &pokeLocations)
