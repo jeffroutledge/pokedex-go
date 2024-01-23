@@ -15,6 +15,10 @@ type config struct {
 	prevLocationsURL *string
 }
 
+type params struct {
+	name string
+}
+
 func startRepl(cfg *config) {
 	reader := bufio.NewScanner(os.Stdin)
 	for {
@@ -22,8 +26,9 @@ func startRepl(cfg *config) {
 		reader.Scan()
 
 		text := cleanInput(reader.Text())
-		if command, exists := cliCommands()[text[0]]; exists {
-			err := command.callback(cfg)
+		if command, commandExists := cliCommands()[text[0]]; commandExists {
+			params := text[1:]
+			err := command.callback(cfg, params)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -60,6 +65,11 @@ func cliCommands() map[string]cliCommand {
 			name:        "map back",
 			description: "Displays the names of the last 20 location areas in the Pokemon world",
 			callback:    commandMapBack,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Diplays all the pokemon in a given area",
+			callback:    commandExplore,
 		},
 	}
 }

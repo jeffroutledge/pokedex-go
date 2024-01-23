@@ -1,2 +1,3 @@
 - [ ] fix alignment in help menu
-- [ ] use pointer instead of dumb list for last and next urls
+- [x] use pointer instead of dumb list for last and next urls
+- [ ] generalize caching to be more dry

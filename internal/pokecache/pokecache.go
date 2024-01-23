@@ -1,7 +1,6 @@
 package pokecache
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -45,7 +44,6 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 
 func (c *Cache) reapLoop(interval time.Duration) {
 	t := time.NewTicker(interval)
-	fmt.Println(<-t.C)
 
 	for range t.C {
 		c.reap(time.Now().UTC(), interval)
