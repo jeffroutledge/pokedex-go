@@ -72,14 +72,14 @@ func (c *Client) GetLocation(pageURL *string) (Area, error) {
 		area := Area{}
 		err := json.Unmarshal([]byte(val), &area)
 		if err != nil {
-			log.Fatal(err)
+			return Area{}, nil
 		}
 		return area, nil
 	}
 
 	res, err := http.Get(fmt.Sprintf(url))
 	if err != nil {
-		log.Fatal(err)
+		return Area{}, nil
 	}
 
 	body, err := io.ReadAll(res.Body)
@@ -88,7 +88,7 @@ func (c *Client) GetLocation(pageURL *string) (Area, error) {
 		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return Area{}, nil
 	}
 
 	c.cache.Add(url, body)
@@ -96,7 +96,7 @@ func (c *Client) GetLocation(pageURL *string) (Area, error) {
 	area := Area{}
 	err = json.Unmarshal([]byte(body), &area)
 	if err != nil {
-		log.Fatal(err)
+		return Area{}, nil
 	}
 
 	return area, nil

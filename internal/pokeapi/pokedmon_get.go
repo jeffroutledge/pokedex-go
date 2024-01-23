@@ -284,7 +284,7 @@ func (c *Client) GetPokemon(pageURL *string) (Pokemon, error) {
 
 	res, err := http.Get(fmt.Sprintf(url))
 	if err != nil {
-		log.Fatal(err)
+		return Pokemon{}, err
 	}
 
 	body, err := io.ReadAll(res.Body)
@@ -293,13 +293,13 @@ func (c *Client) GetPokemon(pageURL *string) (Pokemon, error) {
 		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return Pokemon{}, err
 	}
 
 	pokemon := Pokemon{}
 	err = json.Unmarshal([]byte(body), &pokemon)
 	if err != nil {
-		log.Fatal(err)
+		return Pokemon{}, err
 	}
 
 	return pokemon, nil

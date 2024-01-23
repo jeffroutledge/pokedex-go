@@ -29,14 +29,14 @@ func (c *Client) ListLocations(pageURL *string) (PokeLocations, error) {
 		pokeLocations := PokeLocations{}
 		err := json.Unmarshal([]byte(val), &pokeLocations)
 		if err != nil {
-			log.Fatal(err)
+			return PokeLocations{}, nil
 		}
 		return pokeLocations, nil
 	}
 
 	res, err := http.Get(fmt.Sprintf(url))
 	if err != nil {
-		log.Fatal(err)
+		return PokeLocations{}, nil
 	}
 
 	body, err := io.ReadAll(res.Body)
@@ -45,7 +45,7 @@ func (c *Client) ListLocations(pageURL *string) (PokeLocations, error) {
 		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return PokeLocations{}, nil
 	}
 
 	c.cache.Add(url, body)
@@ -53,7 +53,7 @@ func (c *Client) ListLocations(pageURL *string) (PokeLocations, error) {
 	pokeLocations := PokeLocations{}
 	err = json.Unmarshal([]byte(body), &pokeLocations)
 	if err != nil {
-		log.Fatal(err)
+		return PokeLocations{}, nil
 	}
 
 	return pokeLocations, nil
