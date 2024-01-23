@@ -1,0 +1,2 @@
+## Pokedex project from boot.dev
+- note: I forgot to add messages to commits about if I had looked at the solutions until the explore command implementation, so some of those refactorings are from looking at the back of the book

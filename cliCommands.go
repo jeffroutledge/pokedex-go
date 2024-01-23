@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 )
 
 type cliCommand struct {
@@ -25,7 +27,7 @@ func commandHelp(cfg *config, params []string) error {
 }
 
 func commandMap(cfg *config, params []string) error {
-	locationsResp, err := cfg.pokeapiClient.GetLocations(cfg.nextLocationsURL)
+	locationsResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationsURL)
 	if err != nil {
 		return err
 	}
@@ -44,7 +46,7 @@ func commandMapBack(cfg *config, params []string) error {
 		return errors.New("Can't go back beyond the start, try going forward")
 	}
 
-	locationsResp, err := cfg.pokeapiClient.GetLocations(cfg.prevLocationsURL)
+	locationsResp, err := cfg.pokeapiClient.ListLocations(cfg.prevLocationsURL)
 	if err != nil {
 		return err
 	}
@@ -59,16 +61,45 @@ func commandMapBack(cfg *config, params []string) error {
 }
 
 func commandExplore(cfg *config, params []string) error {
+	if len(params) == 0 {
+		return errors.New("No area name to explore")
+	}
+
 	fmt.Printf("Exploring %s...\n", params[0])
 
-	exploreResp, err := cfg.pokeapiClient.GetPokemonInArea(&params[0])
+	exploreResp, err := cfg.pokeapiClient.GetLocation(&params[0])
 	if err != nil {
 		return err
 	}
 
-	for _, pokemon := range exploreResp.PokemonEncounters {
-		fmt.Println(pokemon.Pokemon.Name)
+	for _, area := range exploreResp.PokemonEncounters {
+		fmt.Println(area.Pokemon.Name)
 	}
+	return nil
+}
+
+func commandCatch(cfg *config, params []string) error {
+	if len(params) == 0 {
+		return errors.New("No pokemon name to catch")
+	}
+
+	catchResp, err := cfg.pokeapiClient.GetPokemon(&params[0])
+	if err != nil {
+		return err
+	}
+	pokemon := catchResp
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon.Name)
+
+	rnd := rand.New(rand.NewSource(time.Now().Unix()))
+	cfg.pokedex[params[0]] = pokemon
+
+	if rnd.Int31n(1000) < int32(pokemon.BaseExperience) {
+		fmt.Printf("%s was caught\n", pokemon.Name)
+	} else {
+		fmt.Printf("%s escaped!\n", pokemon.Name)
+	}
+
 	return nil
 }
 
