@@ -1,3 +1,4 @@
 - [ ] fix alignment in help menu
 - [x] use pointer instead of dumb list for last and next urls
 - [ ] generalize caching to be more dry
+- [ ] write tests to validate commands without input and with input (end-to-end)
