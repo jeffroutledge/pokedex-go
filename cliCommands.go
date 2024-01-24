@@ -128,6 +128,15 @@ func commandInspect(cfg *config, params []string) error {
 	return nil
 }
 
+func commandPokedex(cfg *config, params []string) error {
+	fmt.Println("Your pokedex:")
+	for _, pokemon := range cfg.pokedex {
+		fmt.Printf("  - %s\n", pokemon.Name)
+	}
+
+	return nil
+}
+
 func commandExit(cfg *config, params []string) error {
 	defer os.Exit(3)
 	return nil
